@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Gold Conversion</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Tab Animation */
+    .tab {
+      padding: 15px 30px;
+      cursor: pointer;
+      color: #f8b500;
+      border: none;
+      background: none;
+      border-radius: 20px;
+      transition: background-color 0.3s, transform 0.3s;
+    }
+
+    .tab:hover {
+      background-color: #f8b500;
+      color: white;
+      transform: scale(1.05);
+    }
+
+    .active {
+      background-color: #f8b500;
+      color: white;
+    }
+
+    /* Icon Animation */
+    .animate-icon {
+      display: inline-block;
+      transition: transform 0.3s;
+    }
+
+    .animate-icon:hover {
+      transform: scale(1.2) rotate(15deg); /* Scale and rotate on hover */
+    }
+
+    /* Fade In Animation */
+    .fade-in {
+      animation: fadeIn 1s ease-in-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="bg-yellow-50 min-h-screen p-8">
+  <!-- Tabs Navigation -->
+  <div class="flex justify-center mb-6">
+    <button class="tab active" onclick="navigateTo('home')">
+      <i class="ph ph-house-line text-yellow-500 text-xl animate-icon"></i> Home
+    </button>
+    <button class="tab" onclick="navigateTo('analysis')">
+      <i class="ph ph-chart-bar-line text-yellow-500 text-xl animate-icon"></i> Analysis
+    </button>
+    <button class="tab" onclick="navigateTo('prediction')">
+      <i class="ph ph-chart-line-up text-yellow-500 text-xl animate-icon"></i> Prediction
+    </button>
+    <button class="tab" onclick="navigateTo('conversion')">
+      <i class="ph ph-swap text-yellow-500 text-xl animate-icon"></i> Conversion
+    </button>
+  </div>
+
+  <!-- Gold Conversion Calculator -->
+  <div class="max-w-xl mx-auto bg-white rounded-2xl shadow-lg p-6 fade-in">
+    <h1 class="text-2xl font-semibold mb-4 flex items-center gap-2">
+      <i class="ph ph-swap text-yellow-500 text-3xl animate-icon"></i>
+      Gold Conversion Calculator
+    </h1>
+
+    <div class="mb-4">
+      <label class="block text-sm font-medium mb-1">Enter Quantity:</label>
+      <input type="number" id="quantity" class="w-full border rounded-lg p-2 focus:outline-none focus:ring focus:ring-yellow-300" placeholder="e.g. 10" />
+    </div>
+
+    <div class="mb-4">
+      <label class="block text-sm font-medium mb-1">Select Unit:</label>
+      <div class="grid grid-cols-3 gap-2">
+        <button onclick="setUnit('g')" class="unit-btn bg-yellow-100 hover:bg-yellow-200 p-2 rounded-xl transition-all duration-300">Grams</button>
+        <button onclick="setUnit('oz')" class="unit-btn bg-yellow-100 hover:bg-yellow-200 p-2 rounded-xl transition-all duration-300">Ounces</button>
+        <button onclick="setUnit('kg')" class="unit-btn bg-yellow-100 hover:bg-yellow-200 p-2 rounded-xl transition-all duration-300">Kilograms</button>
+        <button onclick="setUnit('lb')" class="unit-btn bg-yellow-100 hover:bg-yellow-200 p-2 rounded-xl transition-all duration-300">Pounds</button>
+      </div>
+    </div>
+
+    <button onclick="calculateAmount()" class="mt-4 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-xl flex items-center gap-2 transition-all duration-300">
+      <i class="ph ph-currency-circle-dollar animate-icon"></i>
+      Calculate in INR
+    </button>
+
+    <div id="result" class="mt-6 text-xl font-medium text-green-600"></div>
+  </div>
+
+  <script>
+    let selectedUnit = 'g';
+
+    function setUnit(unit) {
+      selectedUnit = unit;
+      document.querySelectorAll('.unit-btn').forEach(btn => btn.classList.remove('bg-yellow-300'));
+      // Set the background color of the selected unit button
+      event.target.classList.add('bg-yellow-300');
+    }
+
+    async function calculateAmount() {
+      const quantity = parseFloat(document.getElementById('quantity').value);
+      if (isNaN(quantity) || quantity <= 0) {
+        alert('Please enter a valid quantity.');
+        return;
+      }
+
+      try {
+        const response = await axios.get('/gold-data');
+        const pricePerGram = response.data.today_price;
+        let grams;
+
+        switch (selectedUnit) {
+          case 'g': grams = quantity; break;
+          case 'kg': grams = quantity * 1000; break;
+          case 'oz': grams = quantity * 31.1035; break;
+          case 'lb': grams = quantity * 8; break;
+        }
+
+        const total = grams * pricePerGram;
+        document.getElementById('result').textContent = `Total Value: ₹ ${total.toFixed(2)}`;
+      } catch (error) {
+        console.error('Error fetching gold rate:', error);
+        alert('Failed to fetch gold price.');
+      }
+    }
+
+    // Function to navigate between tabs
+    function navigateTo(page) {
+      let url;
+      switch (page) {
+        case 'home':
+          url = '/';
+          break;
+        case 'analysis':
+          url = '/analysis';
+          break;
+        case 'prediction':
+          url = '/prediction';
+          break;
+        case 'conversion':
+          url = '/conversion';
+          break;
+      }
+      window.location.href = url;
+    }
+  </script>
+</body>
+</html>

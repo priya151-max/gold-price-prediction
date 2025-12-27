@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Gold Price Analysis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+
+    .tab {
+      padding: 15px 30px;
+      cursor: pointer;
+      color: #f8b500;
+      border: none;
+      background: none;
+      border-radius: 20px;
+      transition: background-color 0.3s, transform 0.3s;
+    }
+
+    .tab:hover {
+      background-color: #f8b500;
+      color: white;
+      transform: scale(1.05);
+    }
+
+    .active {
+      background-color: #f8b500;
+      color: white;
+    }
+
+    .animate-icon {
+      display: inline-block;
+      transition: transform 0.3s;
+    }
+
+    .animate-icon:hover {
+      transform: scale(1.2) rotate(15deg);
+    }
+
+    .fade-in {
+      animation: fadeIn 1s ease-in-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="bg-yellow-50 min-h-screen p-8">
+  <!-- Tabs Navigation -->
+  <div class="flex justify-center mb-6">
+    <button class="tab" onclick="navigateTo('home')">
+      <i class="ph ph-house-line text-yellow-500 text-xl animate-icon"></i> Home
+    </button>
+    <button class="tab active" onclick="navigateTo('analysis')">
+      <i class="ph ph-chart-bar-line text-yellow-500 text-xl animate-icon"></i> Analysis
+    </button>
+    <button class="tab" onclick="navigateTo('prediction')">
+      <i class="ph ph-chart-line-up text-yellow-500 text-xl animate-icon"></i> Prediction
+    </button>
+    <button class="tab" onclick="navigateTo('conversion')">
+      <i class="ph ph-swap text-yellow-500 text-xl animate-icon"></i> Conversion
+    </button>
+  </div>
+
+  <!-- Gold Price Analysis Section -->
+  <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-6 fade-in">
+    <h1 class="text-2xl font-semibold mb-4 flex items-center gap-2">
+      <i class="ph ph-chart-bar-line text-yellow-500 text-3xl animate-icon"></i>
+      Gold Price Analysis
+    </h1>
+
+    <section>
+      <h2 class="text-xl font-semibold mb-4">Anomaly Detection Results</h2>
+      <button id="fetch-results" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-xl flex items-center gap-2 transition-all duration-300">
+        <i class="ph ph-currency-circle-dollar animate-icon"></i> Fetch Anomaly Detection Results
+      </button>
+
+      <div id="results" class="mt-6"></div>
+
+      <!-- Plot section, hidden by default -->
+      <div id="plot-section" class="mt-6 text-center hidden">
+        <h3 class="text-lg font-semibold mb-2 text-yellow-600">Anomaly Detection Plot</h3>
+        <img id="anomalyPlot" src="/anomaly-plot" alt="Anomaly Plot"
+             class="mx-auto rounded-xl shadow-md border border-yellow-300 max-w-full" />
+      </div>
+    </section>
+  </div>
+
+  <script>
+    document.getElementById('fetch-results').addEventListener('click', async () => {
+      const resultsContainer = document.getElementById('results');
+      const plotSection = document.getElementById('plot-section');
+
+      resultsContainer.innerHTML = '<p>Loading...</p>';
+      plotSection.classList.add('hidden');
+
+      try {
+        const response = await fetch('/anomaly-detection');
+        if (!response.ok) throw new Error('Failed to fetch anomaly data.');
+
+        const data = await response.json();
+        resultsContainer.innerHTML = `
+          <p><strong>High Outliers:</strong> ${data.outlier_count.high}</p>
+          <p><strong>Low Outliers:</strong> ${data.outlier_count.low}</p>
+        `;
+        plotSection.classList.remove('hidden');
+      } catch (err) {
+        resultsContainer.innerHTML = `<p>Error: ${err.message}</p>`;
+      }
+    });
+
+    function navigateTo(page) {
+      let url;
+      switch (page) {
+        case 'home': url = '/'; break;
+        case 'analysis': url = '/analysis'; break;
+        case 'prediction': url = '/prediction'; break;
+        case 'conversion': url = '/conversion'; break;
+      }
+      window.location.href = url;
+    }
+  </script>
+</body>
+</html>
