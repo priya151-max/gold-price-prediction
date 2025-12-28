@@ -39,6 +39,16 @@ The application features a gold-themed, animated HTML interface that presents re
 - Backend / ML: Python
 - Libraries: Pandas, NumPy, Scikit-learn
 - Visualization: Matplotlib / Seaborn
+# Demo Video
+## 🎥 Project Demo
+
+This demo showcases the core features of **Verdant Vault**, including
+buying and selling sustainable products, eco-credit tracking, and
+the investor module.
+
+👉 Click here to watch the demo:  
+https://github.com/user-attachments/assets/ca0fa917-d757-448d-b1a5-c5b11779854a
+
 # 📂 Dataset
 - Historical gold price data from 2000 to 2025
 - Cleaned and preprocessed for analysis, prediction, and anomaly detection
